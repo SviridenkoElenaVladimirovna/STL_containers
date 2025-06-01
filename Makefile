@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -Wall -g
 TESTFLAGS = -lgtest -lgmock -pthread
 
-TEST_SRC = tests/test.cpp
+TEST_SRC = tests/tests.cpp
 TEST_TARGET = test-cyclicalList
 
 all: test
