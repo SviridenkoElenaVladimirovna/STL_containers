@@ -1,3 +1,8 @@
+/*
+Sviridenko Elena st130482@student.spbu.ru
+A template container that implements a STL-style.
+It supports iterators, standard concepts, error handling, and standard operators
+*/
 #include <iostream>
 #include "CyclicalList.h"
 

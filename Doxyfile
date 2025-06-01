@@ -1,0 +1,6 @@
+PROJECT_NAME = "CyclicalList"
+INPUT = CyclicalList.h
+RECURSIVE = YES
+EXCLUDE = cmake-build-debug test
+GENERATE_HTML = YES
+GENERATE_LATEX = NO

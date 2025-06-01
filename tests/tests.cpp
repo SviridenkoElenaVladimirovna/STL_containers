@@ -1,5 +1,11 @@
+/*
+Sviridenko Elena st130482@student.spbu.ru
+A template container that implements a STL-style.
+It supports iterators, standard concepts, error handling, and standard operators
+*/
 #include <gtest/gtest.h>
 #include "CyclicalList.h"
+
 
 TEST(CyclicalListTest, PushBackAndFrontBackAccess) {
     CyclicalList<int> list;
@@ -48,6 +54,31 @@ TEST(CyclicalListTest, IteratorTraversal) {
     }
 }
 
+TEST(CyclicalListTest, ConstIterator) {
+    CyclicalList<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    const CyclicalList<int>& constList = list;
+    auto it = constList.begin();
+    EXPECT_EQ(*it, 1);
+    ++it;
+    EXPECT_EQ(*it, 2);
+}
+
+TEST(CyclicalListTest, IteratorEquality) {
+    CyclicalList<int> list;
+    auto it1 = list.begin();
+    auto it2 = list.begin();
+    EXPECT_EQ(it1, it2);
+
+    list.push_back(5);
+    it1 = list.begin();
+    it2 = list.begin();
+    ++it2;
+    EXPECT_NE(it1, it2);
+}
+
 TEST(CyclicalListTest, InsertAndErase) {
     CyclicalList<int> list;
     list.push_back(1);
@@ -75,6 +106,22 @@ TEST(CyclicalListTest, InsertAndErase) {
         EXPECT_EQ(*iter, val);
         ++iter;
     }
+}
+
+TEST(CyclicalListTest, InsertIntoEmptyAtBegin) {
+    CyclicalList<int> list;
+    list.insert(list.begin(), 42);
+    EXPECT_EQ(list.front(), 42);
+    EXPECT_EQ(list.size(), 1);
+}
+
+TEST(CyclicalListTest, InsertEndWorksCorrectly) {
+    CyclicalList<int> list;
+    list.push_back(1);
+    list.push_back(2);
+    list.insert(list.end(), 3);
+    EXPECT_EQ(list.back(), 3);
+    EXPECT_EQ(list.size(), 3);
 }
 
 TEST(CyclicalListTest, ClearAndEmpty) {
@@ -189,45 +236,83 @@ TEST(CyclicalListTest, EraseBeginEndThrows) {
     EXPECT_THROW(list.erase(list.end()), std::out_of_range);
 }
 
-TEST(CyclicalListTest, InsertIntoEmptyAtBegin) {
-    CyclicalList<int> list;
-    list.insert(list.begin(), 42);
-    EXPECT_EQ(list.front(), 42);
-    EXPECT_EQ(list.size(), 1);
+TEST(CyclicalListTest, EqualityEmptyLists) {
+    CyclicalList<int> list1;
+    CyclicalList<int> list2;
+    EXPECT_TRUE(list1 == list2);
+    EXPECT_FALSE(list1 != list2);
 }
 
-TEST(CyclicalListTest, InsertEndWorksCorrectly) {
-    CyclicalList<int> list;
-    list.push_back(1);
-    list.push_back(2);
-    list.insert(list.end(), 3);
-    EXPECT_EQ(list.back(), 3);
-    EXPECT_EQ(list.size(), 3);
+TEST(CyclicalListTest, EqualitySameElements) {
+    CyclicalList<int> list1;
+    CyclicalList<int> list2;
+
+    list1.push_back(1);
+    list1.push_back(2);
+    list1.push_back(3);
+
+    list2.push_back(1);
+    list2.push_back(2);
+    list2.push_back(3);
+
+    EXPECT_TRUE(list1 == list2);
+    EXPECT_FALSE(list1 != list2);
 }
 
-TEST(CyclicalListTest, IteratorEquality) {
-    CyclicalList<int> list;
-    auto it1 = list.begin();
-    auto it2 = list.begin();
-    EXPECT_EQ(it1, it2);
+TEST(CyclicalListTest, InequalityDifferentSizes) {
+    CyclicalList<int> list1;
+    CyclicalList<int> list2;
 
-    list.push_back(5);
-    it1 = list.begin();
-    it2 = list.begin();
-    ++it2;
-    EXPECT_NE(it1, it2);
+    list1.push_back(1);
+    list1.push_back(2);
+
+    list2.push_back(1);
+    list2.push_back(2);
+    list2.push_back(3);
+
+    EXPECT_FALSE(list1 == list2);
+    EXPECT_TRUE(list1 != list2);
 }
 
-TEST(CyclicalListTest, ConstIterator) {
-    CyclicalList<int> list;
-    list.push_back(1);
-    list.push_back(2);
+TEST(CyclicalListTest, InequalityDifferentValues) {
+    CyclicalList<int> list1;
+    CyclicalList<int> list2;
 
-    const CyclicalList<int>& constList = list;
-    auto it = constList.begin();
-    EXPECT_EQ(*it, 1);
-    ++it;
-    EXPECT_EQ(*it, 2);
+    list1.push_back(1);
+    list1.push_back(2);
+    list1.push_back(3);
+
+    list2.push_back(1);
+    list2.push_back(99);
+    list2.push_back(3);
+
+    EXPECT_FALSE(list1 == list2);
+    EXPECT_TRUE(list1 != list2);
+}
+
+TEST(CyclicalListTest, EqualityAfterCopy) {
+    CyclicalList<std::string> list1;
+    list1.push_back("a");
+    list1.push_back("b");
+
+    CyclicalList<std::string> list2 = list1;
+
+    EXPECT_TRUE(list1 == list2);
+    EXPECT_FALSE(list1 != list2);
+}
+
+TEST(CyclicalListTest, EqualityAfterMove) {
+    CyclicalList<int> list1;
+    list1.push_back(10);
+    list1.push_back(20);
+
+    CyclicalList<int> list2 = std::move(list1);
+
+    CyclicalList<int> expected;
+    expected.push_back(10);
+    expected.push_back(20);
+
+    EXPECT_TRUE(list2 == expected);
 }
 
 int main(int argc, char **argv) {

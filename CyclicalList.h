@@ -1,17 +1,41 @@
+/*
+Sviridenko Elena st130482@student.spbu.ru
+A template container that implements a STL-style.
+It supports iterators, standard concepts, error handling, and standard operators
+*/
 #ifndef CYCLICALLIST_H
 #define CYCLICALLIST_H
-
+/**
+ * @file CyclicalList.h
+ * @brief Implementation of an STL-style cyclic double-linked list.
+ *
+ * a template container that implements an STL-style
+ *
+ *It supports iterators, standard concepts, error handling, and standard operators
+ */
 
 #include <cstddef>
 #include <iterator>
 #include <stdexcept>
 #include <concepts>
 #include <utility>
-
+/**
+ * @class CyclicalList
+ * @brief A cyclic bilinked list with an STL container interface.
+ *
+ * Stores elements of type `T` as a cyclic doubly-linked structure.
+ * Supports insertion at start and end, deletion, iterators, and relocation.
+ *
+ * @tparam T The type of elements stored in the list. Must be copyable and destructible.
+ */
 template <typename T>
 requires std::copy_constructible<T> && std::destructible<T>
 class CyclicalList {
 private:
+    /**
+    * @struct Node
+    * @brief List Node. Stores data and pointers to next/previous nodes.
+    */
     struct Node {
         T data;
         Node* next;
@@ -23,7 +47,10 @@ private:
 
     Node* head = nullptr;
     size_t count = 0;
-
+    /**
+     * @brief Checks that the list is not empty.
+     * @throws std::out_of_range if the list is empty.
+     */
     void check_not_empty() const {
         if (empty()) {
             throw std::out_of_range("CyclicalList: operation on empty list");
@@ -67,7 +94,13 @@ public:
     ~CyclicalList() {
         clear();
     }
-
+    /**
+       * @class iterator
+       * @brief Bidirectional iterator on list elements.
+       *
+       * Allows to move forward and backward through the list.
+       * Compatible with STL algorithms.
+       */
     class iterator {
         friend class CyclicalList;
 
@@ -314,9 +347,31 @@ public:
         std::swap(head, other.head);
         std::swap(count, other.count);
     }
+    bool operator==(const CyclicalList& other) const {
+        if (count != other.count) return false;
+        auto it1 = begin();
+        auto it2 = other.begin();
+        while (it1 != end() && it2 != other.end()) {
+            if (*it1 != *it2) return false;
+            ++it1;
+            ++it2;
+        }
+        return true;
+    }
+
+    bool operator!=(const CyclicalList& other) const {
+        return !(*this == other);
+    }
+
+
 };
 
-
+/**
+ * @brief Exchanges the contents of two lists.
+ * @tparam T The type of items in the list.
+ * @param lhs First list.
+ * @param rhs Second list.
+ */
 template <typename T>
 void swap(CyclicalList<T>& lhs, CyclicalList<T>& rhs) noexcept {
     lhs.swap(rhs);
